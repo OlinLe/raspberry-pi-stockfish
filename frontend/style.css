@@ -1,0 +1,47 @@
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 30px;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+
+    width: min(90vw, 480px);
+    aspect-ratio: 1;
+
+    margin: 20px auto;
+    border: 2px solid black;
+}
+
+.square {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: clamp(20px, 6vw, 42px);
+    cursor: pointer;
+    border: none;
+    padding: 0;
+}
+
+.light {
+    background-color: #f0d9b5;
+}
+
+.dark {
+    background-color: #b58863;
+}
+
+.selected {
+    outline: 3px solid yellow;
+    outline-offset: -3px;
+}
+
+#restart {
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
