@@ -1,4 +1,3 @@
-
 body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -25,6 +24,7 @@ body {
     cursor: pointer;
     border: none;
     padding: 0;
+/*FIX UNUSED ROWS BEING SHALLOW */
 }
 
 .light {

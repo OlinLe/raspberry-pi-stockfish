@@ -1,4 +1,3 @@
-
 const boardElement = document.getElementById("board");
 const statusElement = document.getElementById("status");
 const restartButton = document.getElementById("restart");
