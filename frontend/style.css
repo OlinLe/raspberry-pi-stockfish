@@ -1,30 +1,29 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    margin: 30px;
+    margin: 30px
 }
 
 #board {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: repeat(8, minmax(0, 1fr));
     width: min(90vw, 480px);
     aspect-ratio: 1;
-
-    margin: 20px auto;
-    border: 2px solid black;
+    margin: 0 auto;
 }
 
 .square {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: clamp(20px, 6vw, 42px);
-    cursor: pointer;
-    border: none;
+    width: 100%;
+    height: 100%;
     padding: 0;
-/*FIX UNUSED ROWS BEING SHALLOW */
+    box-sizing: border-box;
+
+    display: grid;
+    place-items: center;
+
+    font-size: clamp(20px, 5vw, 42px);
+    line-height: 1;
 }
 
 .light {
