@@ -1,6 +1,6 @@
 # Raspberry Pi Stockfish Chess
 
-CURRENT WORKING LINK: https://ellen-hugo-improve-columnists.trycloudflare.com/
+CURRENT WORKING LINK: https://hoster.tailb60b9d.ts.net/
 
 A self-hosted chess website where you can play against Stockfish running on a Raspberry Pi 3.
 
