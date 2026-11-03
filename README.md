@@ -1,21 +1,21 @@
 # Raspberry Pi Stockfish Chess
 
-CURRENT WORKING LINK: https://hoster.tailb60b9d.ts.net/
+**[Live Demo](https://hoster.tailb60b9d.ts.net/)**
 
-A self-hosted chess website where you can play against Stockfish running on a Raspberry Pi 3.
+A self-hosted chess web application where users can play against the Stockfish chess engine running on a Raspberry Pi 3.
 
 ## Features
 
 - Interactive chessboard with legal-move validation
 - Stockfish AI opponent
 - REST API for game creation and moves
-- Self-hosted Linux server with public HTTPS access
+- Public HTTPS access via Tailscale Funnel
 
 ## Tech Stack
 
 - **Frontend:** HTML, CSS, JavaScript
-- **Backend:** Python, FastAPI, python-chess
-- **Hosting:** Raspberry Pi 3, Linux, systemd, Cloudflare Tunnel
+- **Backend:** Python, FastAPI, python-chess, Stockfish
+- **Infrastructure:** Raspberry Pi 3, Linux, systemd, Tailscale Funnel
 
 ## Installation
 
@@ -29,7 +29,7 @@ pip install fastapi uvicorn python-chess
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000` on the Raspberry Pi.
+Open `http://127.0.0.1:8000` on the host machine.
 
 ## API Endpoints
 
@@ -41,4 +41,4 @@ Open `http://127.0.0.1:8000` on the Raspberry Pi.
 
 ## Hosting
 
-Hosted on a Raspberry Pi 3 using systemd for automatic startup and Cloudflare Tunnel for temporary public HTTPS access.
+Hosted on a Raspberry Pi 3 running Linux, with systemd managing automatic startup and process recovery. Tailscale Funnel provides a stable public HTTPS address without requiring router port forwarding.
