@@ -1,77 +1,234 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
+    margin: 0;
+    min-height: 100vh;
     font-family: Arial, sans-serif;
+    background: #f5f6f3;
+    color: #27352e;
     text-align: center;
-    margin: 30px;
-    background-color: white;
 }
 
+.page {
+    padding: 32px 20px 60px;
+}
+
+.site-header h1 {
+    margin: 8px 0;
+    font-size: 34px;
+}
+
+.eyebrow {
+    margin: 0;
+    color: #6b7b70;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    margin: 0;
+    color: #68756d;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 24px auto;
+}
+
+.color-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid #dce2da;
+    border-radius: 9px;
+}
+
+.color-control label {
+    font-size: 14px;
+    color: #52645a;
+}
+
+#player-color {
+    border: none;
+    background: white;
+    color: #27352e;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#restart {
+    padding: 13px 20px;
+    border: none;
+    border-radius: 9px;
+    background: #315c46;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#restart:hover {
+    background: #254b38;
+}
+
+#restart:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* Equal space on both sides keeps the board exactly centered. */
 #game-layout {
-    position: relative;
-    margin: 20px auto;
-}
-
-#board {
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    grid-template-rows: repeat(8, minmax(0, 1fr));
-    width: min(90vw, 480px);
-    aspect-ratio: 1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 480px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    max-width: 1120px;
     margin: 0 auto;
 }
 
+#game-layout::before {
+    content: "";
+    grid-column: 1;
+}
+
+#board {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: repeat(8, minmax(0, 1fr));
+    width: 100%;
+    aspect-ratio: 1;
+    border: 6px solid white;
+    border-radius: 9px;
+    overflow: hidden;
+    box-shadow: 0 7px 24px rgba(26, 43, 32, 0.13);
+}
+
 .square {
+    display: grid;
+    place-items: center;
     width: 100%;
     height: 100%;
     padding: 0;
-    box-sizing: border-box;
-    display: grid;
-    place-items: center;
-    font-size: clamp(20px, 5vw, 42px);
+    border: 0;
+    font-size: clamp(20px, 4vw, 42px);
     line-height: 1;
+    cursor: pointer;
 }
 
 .light {
-    background-color: #f0d9b5;
+    background: #f0dfbe;
 }
 
 .dark {
-    background-color: #b58863;
+    background: #ae8964;
+}
+
+.square:hover {
+    box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.35);
 }
 
 .selected {
-    outline: 3px solid yellow;
+    box-shadow: inset 0 0 0 4px #f3c957;
+}
+
+.square:focus-visible {
+    outline: 3px solid #315c46;
     outline-offset: -3px;
 }
 
 #history-panel {
-    width: 180px;
+    grid-column: 3;
+    width: 100%;
+    max-width: 220px;
+    min-height: 220px;
     max-height: 480px;
     overflow-y: auto;
-    padding: 10px;
-    border: 1px solid #555;
-    border-radius: 6px;
+    padding: 18px;
+    background: white;
+    border: 1px solid #e2e6df;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(26, 43, 32, 0.06);
     text-align: left;
-    position: absolute;
-    top: 0;
-    left: calc(50% + 260px);
 }
 
-#history-panel h3 {
-    margin-top: 0;
+#history-panel h2 {
+    margin: 0 0 16px;
+    font-size: 17px;
 }
 
 #move-history div {
-    padding: 3px 0;
+    padding: 9px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
 }
 
-#restart {
-    padding: 8px 16px;
-    cursor: pointer;
+#move-history div:nth-child(odd) {
+    background: #f3f5f1;
 }
 
-@media (max-width: 1000px) {
+#move-history:empty::before {
+    content: "Moves will appear here.";
+    color: #8a978e;
+    font-size: 13px;
+}
+
+#status {
+    margin: 22px auto 0;
+    color: #52645a;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+/* Stack history below the board on smaller screens. */
+@media (max-width: 1050px) {
+    #game-layout {
+        grid-template-columns: minmax(0, 480px);
+        justify-content: center;
+        gap: 20px;
+    }
+
+    #game-layout::before {
+        display: none;
+    }
+
+    #board,
     #history-panel {
-        position: static;
-        margin: 20px auto;
+        grid-column: 1;
+    }
+
+    #history-panel {
+        max-width: none;
+        min-height: 110px;
+        max-height: 240px;
+    }
+}
+
+@media (max-width: 500px) {
+    .page {
+        padding: 24px 12px 40px;
+    }
+
+    .site-header h1 {
+        font-size: 28px;
+    }
+
+    #board {
+        border-width: 4px;
+    }
+
+    .square {
+        font-size: clamp(20px, 7vw, 34px);
     }
 }
