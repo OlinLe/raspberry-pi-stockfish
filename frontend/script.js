@@ -1,6 +1,8 @@
 const boardElement = document.getElementById("board");
 const statusElement = document.getElementById("status");
 const restartButton = document.getElementById("restart");
+const colorSelect = document.getElementById("player-color");
+const historyElement = document.getElementById("move-history");
 
 const pieces = {
     K: "♔", Q: "♕", R: "♖",
@@ -14,6 +16,7 @@ let currentFen = null;
 let selected = null;
 let busy = false;
 let gameOver = false;
+let playerColor = "white";
 
 // Convert the FEN position into an 8x8 board.
 function parseFen(fen) {
@@ -39,6 +42,16 @@ function parseFen(fen) {
     return board;
 }
 
+// Check whether a piece belongs to the player.
+function isOwnPiece(piece) {
+    if (!piece) return false;
+
+    if (playerColor === "white") {
+        return piece === piece.toUpperCase();
+    }
+    return piece === piece.toLowerCase();
+}
+
 // Draw the chessboard.
 function renderBoard() {
     const board = parseFen(currentFen);
@@ -48,8 +61,11 @@ function renderBoard() {
         for (let col = 0; col < 8; col++) {
             const square = document.createElement("button");
 
-            const file = "abcdefgh"[col];
-            const rank = 8 - row;
+            // Turn the board around when playing Black.
+            const boardRow = playerColor === "white" ? row : 7 - row;
+            const boardCol = playerColor === "white" ? col : 7 - col;
+            const file = "abcdefgh"[boardCol];
+            const rank = 8 - boardRow;
             const name = file + rank;
 
             square.className = "square";
@@ -61,7 +77,7 @@ function renderBoard() {
                 square.classList.add("selected");
             }
 
-            const piece = board[row][col];
+            const piece = board[boardRow][boardCol];
             square.textContent = pieces[piece] || "";
 
             square.onclick = () => selectSquare(name, piece);
@@ -70,12 +86,25 @@ function renderBoard() {
     }
 }
 
+// Display moves in standard chess notation.
+function renderHistory(moves) {
+    historyElement.innerHTML = "";
+
+    for (let i = 0; i < moves.length; i += 2) {
+        const line = document.createElement("div");
+        line.textContent = `${i / 2 + 1}. ${moves[i]} ${moves[i + 1] || ""}`;
+        historyElement.appendChild(line);
+    }
+
+    historyElement.scrollTop = historyElement.scrollHeight;
+}
+
 // Handle clicking chess squares.
 async function selectSquare(square, piece) {
     if (busy || gameOver) return;
 
     if (selected === null) {
-        if (piece && piece === piece.toUpperCase()) {
+        if (isOwnPiece(piece)) {
             selected = square;
             renderBoard();
         }
@@ -91,7 +120,7 @@ async function selectSquare(square, piece) {
     const from = selected;
     selected = null;
 
-    if (piece && piece === piece.toUpperCase()) {
+    if (isOwnPiece(piece)) {
         selected = square;
         renderBoard();
         return;
@@ -105,7 +134,8 @@ async function selectSquare(square, piece) {
     const movingPiece = board[fromRow][fromCol];
 
     // Ask which piece to promote to.
-    if (movingPiece === "P" && square[1] === "8") {
+    if (movingPiece && movingPiece.toLowerCase() === "p" &&
+        square[1] === (playerColor === "white" ? "8" : "1")) {
         const choice = prompt("Promote to q, r, b, or n:", "q");
 
         if (choice === null) {
@@ -148,6 +178,7 @@ async function selectSquare(square, piece) {
 
         currentFen = data.fen;
         gameOver = data.game_over;
+        renderHistory(data.san_moves);
 
         statusElement.textContent = gameOver
             ? `Game over: ${data.result}`
@@ -167,11 +198,17 @@ async function newGame() {
 
     busy = true;
     restartButton.disabled = true;
+    colorSelect.disabled = true;
     statusElement.textContent = "Starting game...";
+    const chosenColor = colorSelect.value;
 
     try {
         const response = await fetch("/api/games", {
-            method: "POST"
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ color: chosenColor })
         });
 
         const data = await response.json();
@@ -183,9 +220,11 @@ async function newGame() {
         gameId = data.game_id;
         currentFen = data.fen;
         selected = null;
-        gameOver = false;
+        gameOver = data.game_over;
+        playerColor = chosenColor;
 
         renderBoard();
+        renderHistory(data.san_moves);
         statusElement.textContent = "Your turn";
 
     } catch (error) {
@@ -193,6 +232,7 @@ async function newGame() {
     } finally {
         busy = false;
         restartButton.disabled = false;
+        colorSelect.disabled = false;
     }
 }
 

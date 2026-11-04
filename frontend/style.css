@@ -1,8 +1,17 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    margin: 30px
+    margin: 30px;
     background-color: grey;
+}
+
+#game-layout {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 20px auto;
 }
 
 #board {
@@ -11,7 +20,6 @@ body {
     grid-template-rows: repeat(8, minmax(0, 1fr));
     width: min(90vw, 480px);
     aspect-ratio: 1;
-    margin: 0 auto;
 }
 
 .square {
@@ -19,10 +27,8 @@ body {
     height: 100%;
     padding: 0;
     box-sizing: border-box;
-
     display: grid;
     place-items: center;
-
     font-size: clamp(20px, 5vw, 42px);
     line-height: 1;
 }
@@ -40,8 +46,25 @@ body {
     outline-offset: -3px;
 }
 
+#history-panel {
+    width: 180px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    text-align: left;
+}
+
+#history-panel h3 {
+    margin-top: 0;
+}
+
+#move-history div {
+    padding: 3px 0;
+}
+
 #restart {
     padding: 8px 16px;
     cursor: pointer;
 }
-
