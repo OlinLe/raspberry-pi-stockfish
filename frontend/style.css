@@ -2,15 +2,11 @@ body {
     font-family: Arial, sans-serif;
     text-align: center;
     margin: 30px;
-    background-color: grey;
+    background-color: white;
 }
 
 #game-layout {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 20px;
+    position: relative;
     margin: 20px auto;
 }
 
@@ -20,6 +16,7 @@ body {
     grid-template-rows: repeat(8, minmax(0, 1fr));
     width: min(90vw, 480px);
     aspect-ratio: 1;
+    margin: 0 auto;
 }
 
 .square {
@@ -54,6 +51,9 @@ body {
     border: 1px solid #555;
     border-radius: 6px;
     text-align: left;
+    position: absolute;
+    top: 0;
+    left: calc(50% + 260px);
 }
 
 #history-panel h3 {
@@ -67,4 +67,11 @@ body {
 #restart {
     padding: 8px 16px;
     cursor: pointer;
+}
+
+@media (max-width: 1000px) {
+    #history-panel {
+        position: static;
+        margin: 20px auto;
+    }
 }
