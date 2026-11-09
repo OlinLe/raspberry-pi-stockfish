@@ -6,8 +6,10 @@
     <title>Raspberry Pi Chess</title>
     <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
     <main class="page">
+
         <header class="site-header">
             <p class="eyebrow">RASPBERRY PI 3 · STOCKFISH</p>
             <h1>Raspberry Pi Chess</h1>
@@ -22,19 +24,42 @@
                     <option value="black">Black</option>
                 </select>
             </div>
+
             <button id="restart" type="button">New Game</button>
         </div>
 
         <div id="game-layout">
+
+            <!-- Left panel: Raspberry Pi statistics -->
+            <aside id="server-stats">
+                <h2>Raspberry Pi Status</h2>
+
+                <div class="stats-grid">
+                    <p>CPU: <span id="cpu">--</span>%</p>
+                    <p>RAM: <span id="ram">--</span>%</p>
+                    <p>Disk: <span id="disk">--</span>%</p>
+                    <p>Temp: <span id="temperature">--</span></p>
+                </div>
+
+                <h3>Chess Statistics</h3>
+
+                <p>Games: <span id="games-count">0</span></p>
+                <p>Moves: <span id="moves-count">0</span></p>
+            </aside>
+
+            <!-- Center: Chessboard -->
             <div id="board" aria-label="Chessboard"></div>
 
+            <!-- Right panel: Move history -->
             <aside id="history-panel">
                 <h2>Move History</h2>
                 <div id="move-history"></div>
             </aside>
+
         </div>
 
         <p id="status" role="status">Loading game...</p>
+
     </main>
 
     <script src="/script.js"></script>

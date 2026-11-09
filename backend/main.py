@@ -8,6 +8,7 @@ from typing import Literal, Optional
 
 import chess
 import chess.engine
+import psutil
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -172,6 +173,33 @@ async def make_move(game_id: str, request: MoveRequest):
         game["updated"] = time.monotonic()
         game["busy"] = False
         return game_data(game_id, board)
+
+
+@app.get("/api/stats")
+def get_stats():
+    # Read the Raspberry Pi CPU temperature.
+    try:
+        with open("/sys/class/thermal/thermal_zone0/temp") as file:
+            temperature = round(int(file.read()) / 1000, 1)
+    except (OSError, ValueError):
+        temperature = None
+
+    # Count games and moves currently stored in memory.
+    with games_lock:
+        game_count = len(games)
+        move_count = sum(
+            len(game["board"].move_stack)
+            for game in games.values()
+        )
+
+    return {
+        "cpu": psutil.cpu_percent(interval=0.1),
+        "ram": psutil.virtual_memory().percent,
+        "disk": psutil.disk_usage("/").percent,
+        "temperature": temperature,
+        "games": game_count,
+        "moves": move_count
+    }
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent

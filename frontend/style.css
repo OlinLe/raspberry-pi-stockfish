@@ -15,6 +15,8 @@ body {
     padding: 32px 20px 60px;
 }
 
+/* Header */
+
 .site-header h1 {
     margin: 8px 0;
     font-size: 34px;
@@ -32,6 +34,8 @@ body {
     margin: 0;
     color: #68756d;
 }
+
+/* Game controls */
 
 .toolbar {
     display: flex;
@@ -86,27 +90,26 @@ body {
     cursor: wait;
 }
 
-/* Equal space on both sides keeps the board exactly centered. */
+/* Main layout: Stats | Board | History */
+
 #game-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 480px) minmax(0, 1fr);
+    grid-template-columns: 220px minmax(0, 480px) 220px;
     gap: 24px;
     align-items: start;
-    max-width: 1120px;
+    justify-content: center;
+    max-width: 980px;
     margin: 0 auto;
 }
 
-#game-layout::before {
-    content: "";
-    grid-column: 1;
-}
+/* Chessboard */
 
 #board {
-    grid-column: 2;
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));
     grid-template-rows: repeat(8, minmax(0, 1fr));
     width: 100%;
+    max-width: 480px;
     aspect-ratio: 1;
     border: 6px solid white;
     border-radius: 9px;
@@ -147,10 +150,11 @@ body {
     outline-offset: -3px;
 }
 
+/* Shared sidebar styling */
+
+#server-stats,
 #history-panel {
-    grid-column: 3;
     width: 100%;
-    max-width: 220px;
     min-height: 220px;
     max-height: 480px;
     overflow-y: auto;
@@ -162,10 +166,40 @@ body {
     text-align: left;
 }
 
+#server-stats h2,
 #history-panel h2 {
     margin: 0 0 16px;
     font-size: 17px;
 }
+
+/* Raspberry Pi statistics */
+
+#server-stats h3 {
+    margin: 18px 0 10px;
+    font-size: 15px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.stats-grid p {
+    margin: 0;
+    padding: 10px 12px;
+    background: #f3f5f1;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#server-stats > p {
+    margin: 8px 0;
+    color: #52645a;
+    font-size: 14px;
+}
+
+/* Move history */
 
 #move-history div {
     padding: 9px 10px;
@@ -184,6 +218,8 @@ body {
     font-size: 13px;
 }
 
+/* Game status */
+
 #status {
     margin: 22px auto 0;
     color: #52645a;
@@ -191,7 +227,8 @@ body {
     font-weight: bold;
 }
 
-/* Stack history below the board on smaller screens. */
+/* Smaller screens: stack the panels and board */
+
 @media (max-width: 1050px) {
     #game-layout {
         grid-template-columns: minmax(0, 480px);
@@ -199,21 +236,25 @@ body {
         gap: 20px;
     }
 
-    #game-layout::before {
-        display: none;
-    }
-
+    #server-stats,
     #board,
     #history-panel {
-        grid-column: 1;
+        width: 100%;
+        max-width: 480px;
     }
 
+    #server-stats,
     #history-panel {
-        max-width: none;
         min-height: 110px;
         max-height: 240px;
     }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
+
+/* Phones */
 
 @media (max-width: 500px) {
     .page {

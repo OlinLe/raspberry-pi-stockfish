@@ -238,3 +238,30 @@ async function newGame() {
 
 restartButton.onclick = newGame;
 newGame();
+
+// Update the Raspberry Pi statistics every 15 seconds.
+async function updateStats() {
+    try {
+        const response = await fetch("/api/stats");
+
+        if (!response.ok) {
+            throw new Error("Could not fetch server stats");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("cpu").textContent = data.cpu;
+        document.getElementById("ram").textContent = data.ram;
+        document.getElementById("disk").textContent = data.disk;
+        document.getElementById("temperature").textContent =
+            data.temperature === null ? "N/A" : data.temperature + "°C";
+        document.getElementById("games-count").textContent = data.games;
+        document.getElementById("moves-count").textContent = data.moves;
+
+    } catch (error) {
+        console.error("Stats error:", error);
+    }
+}
+
+updateStats();
+setInterval(updateStats, 5000);
