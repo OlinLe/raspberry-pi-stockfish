@@ -1,5 +1,6 @@
 import asyncio
 import os
+import sqlite3
 import threading
 import time
 import uuid
@@ -14,7 +15,10 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from backend.database import init_db, save_game, save_new_moves, get_totals
+
 app = FastAPI(title="Pi Stockfish Chess")
+init_db()
 
 ENGINE_PATH = os.getenv("STOCKFISH_PATH", "/usr/games/stockfish")
 
@@ -24,7 +28,6 @@ GAME_TTL = 3600
 games = {}
 games_lock = threading.Lock()
 engine_lock = threading.Lock()
-
 engine = None
 
 
@@ -47,7 +50,7 @@ def get_engine():
 
 
 def game_data(game_id, board):
-    # Replay moves to convert them to readable chess notation.
+    # Replay moves to convert them into readable chess notation.
     replay = chess.Board()
     san_moves = []
 
@@ -89,7 +92,7 @@ def new_game(request: Optional[NewGameRequest] = None):
     color = request.color if request else "white"
     board = chess.Board()
 
-    # Stockfish makes the first move if the player picks Black.
+    # Stockfish plays first if the player chooses Black.
     if color == "black":
         try:
             board.push(calculate_move(board))
@@ -101,8 +104,7 @@ def new_game(request: Optional[NewGameRequest] = None):
     with games_lock:
         expired = [
             gid for gid, g in games.items()
-            if now - g["updated"] > GAME_TTL
-            and not g["busy"]
+            if now - g["updated"] > GAME_TTL and not g["busy"]
         ]
 
         for gid in expired:
@@ -112,6 +114,11 @@ def new_game(request: Optional[NewGameRequest] = None):
             raise HTTPException(503, "Server is busy")
 
         game_id = uuid.uuid4().hex
+
+        try:
+            save_game(game_id, board)
+        except sqlite3.Error:
+            raise HTTPException(503, "Could not save game")
 
         games[game_id] = {
             "board": board,
@@ -155,6 +162,13 @@ async def make_move(game_id: str, request: MoveRequest):
         game["updated"] = time.monotonic()
 
         if board.is_game_over(claim_draw=True):
+            try:
+                save_new_moves(game_id, board, 1)
+            except sqlite3.Error:
+                board.pop()
+                game["busy"] = False
+                raise HTTPException(503, "Could not save move")
+
             game["busy"] = False
             return game_data(game_id, board)
 
@@ -170,6 +184,15 @@ async def make_move(game_id: str, request: MoveRequest):
 
     with games_lock:
         board.push(reply)
+
+        try:
+            save_new_moves(game_id, board, 2)
+        except sqlite3.Error:
+            board.pop()
+            board.pop()
+            game["busy"] = False
+            raise HTTPException(503, "Could not save moves")
+
         game["updated"] = time.monotonic()
         game["busy"] = False
         return game_data(game_id, board)
@@ -177,23 +200,18 @@ async def make_move(game_id: str, request: MoveRequest):
 
 @app.get("/api/stats")
 def get_stats():
-    # Read the Raspberry Pi CPU temperature.
+    # Raspberry Pi CPU temperature, in degrees Celsius.
     try:
         with open("/sys/class/thermal/thermal_zone0/temp") as file:
             temperature = round(int(file.read()) / 1000, 1)
     except (OSError, ValueError):
         temperature = None
 
-    # Count games and moves currently stored in memory.
-    with games_lock:
-        game_count = len(games)
-        move_count = sum(
-            len(game["board"].move_stack)
-            for game in games.values()
-        )
+    # These totals come from SQLite, not the in-memory games dictionary.
+    game_count, move_count = get_totals()
 
     return {
-        "cpu": psutil.cpu_percent(interval=0.1),
+        "cpu": psutil.cpu_percent(interval=1),
         "ram": psutil.virtual_memory().percent,
         "disk": psutil.disk_usage("/").percent,
         "temperature": temperature,

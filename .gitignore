@@ -13,3 +13,8 @@ __pycache__/
 # Editor and OS files
 .DS_Store
 .vscode/
+
+# Sqlite Dbs
+chess.db
+chess.db-*
+
